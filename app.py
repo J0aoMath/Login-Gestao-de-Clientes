@@ -1,8 +1,7 @@
 from tkinter import *
 import customtkinter as ctk
-import openpyxl
-import pathlib
-
+import openpyxl 
+import pathlib 
 #aparencia padrao
 ctk.set_appearance_mode('System')
 ctk.set_default_color_theme('blue')
@@ -26,15 +25,67 @@ class App(ctk.CTk):
         ctk.set_appearance_mode(nova_aparencia)
 
     def todo_sistema(self):
-        frame = ctk.CTkFrame(self, width=700, height=50, corner_radius=0, bg_color='teal',fg_color='teal').place(x=0,y=1)
-        title = ctk.CTkLabel(frame,text='Sistema de Gestao de Clientes', font=('Century Gothic bold',24), text_color='#fff')
+        frame = ctk.CTkFrame(self, width=700, height=50, corner_radius=0, bg_color='teal',fg_color='teal')
+        frame.place(x=0,y=10)
+        title = ctk.CTkLabel(frame,text='Sistema de Gestao de Clientes', font=('Century Gothic bold',24), text_color='#fff' ).place(x=190,y=10)
         span = ctk.CTkLabel(self,text='Por favor, preencher todos os campos do formulário.', font=('Century Gothic bold',24), text_color=['#000','#fff']).place(x=50,y=70)
 
+        ficheiro = pathlib.Path('Clientes.xlsx')
+        
+        if ficheiro.exists():
+            pass
+        else:
+            ficheiro = openpyxl.Workbook()
+            folha=ficheiro.active
+            folha['A1']='Nome Completo'
+            folha['B1'] = 'Contato'
+            folha['C1'] = 'Idade'
+            folha['D1'] = 'Genero'
+            folha['E1'] = 'Endereço'
+            folha['F1'] = 'Observações'
+                
+            ficheiro.save("Clientes.xlsx")
+
+        def submit(): 
+            #pegando dados dos entrys
+            name = name_value.get()
+            contact = contact_value.get()
+            age = age_value.get()
+            gender = gender_combobox.get()
+            address = adress_value.get()
+            obs = obs_entry.get(0.0,END)
+            
+            ficheiro = openpyxl.load_workbook('Clientes.xlsx')
+            folha = ficheiro.active
+            folha.cell(column=1, row=folha.max_row+1, value=name)
+            folha.cell(column=2, row=folha.max_row, value=contact)
+            folha.cell(column=3, row=folha.max_row, value=age)
+            folha.cell(column=4, row=folha.max_row, value=gender)
+            folha.cell(column=5, row=folha.max_row, value=address)
+            folha.cell(column=6, row=folha.max_row, value=obs)
+            
+            ficheiro.save(r'Clientes.xlsx') 
+            
+        def clear():
+            name_value.set('')
+            contact_value.set('')
+            age_value.set('')
+            adress_value.set('')
+            obs_entry.delete(0.0, END)
+ 
+ 
+        #Text variables
+        name_value = StringVar()
+        contact_value = StringVar()
+        age_value = StringVar()
+        adress_value = StringVar()
+        
+        
         #Entries
-        name_entry = ctk.CTkEntry(self, width=350, font=('Century Gothic bold', 16),fg_color='transparent')
-        contact_entry = ctk.CTkEntry(self, width=200, font=('Century Gothic bold', 16),fg_color='transparent')
-        age_entry = ctk.CTkEntry(self, width=150, font=('Century Gothic bold', 16),fg_color='transparent')
-        adress_entry = ctk.CTkEntry(self, width=200, font=('Century Gothic bold', 16),fg_color='transparent')
+        name_entry = ctk.CTkEntry(self,textvariable=name_value, width=350, font=('Century Gothic bold', 16),fg_color='transparent')
+        contact_entry = ctk.CTkEntry(self,textvariable=contact_value, width=200, font=('Century Gothic bold', 16),fg_color='transparent')
+        age_entry = ctk.CTkEntry(self,textvariable=age_value, width=150, font=('Century Gothic bold', 16),fg_color='transparent')
+        adress_entry = ctk.CTkEntry(self,textvariable=adress_value, width=200, font=('Century Gothic bold', 16),fg_color='transparent')
         
         #Combobox
         gender_combobox = ctk.CTkComboBox(self,values=['Masculino','Feminino'], font=('Century Gothic bold', 14))
@@ -51,7 +102,8 @@ class App(ctk.CTk):
         lb_gender = ctk.CTkLabel(self,text='Genero', font=('Century Gothic bold',16), text_color=['#000','#fff'])
         lb_adress = ctk.CTkLabel(self,text='Endereço', font=('Century Gothic bold',16), text_color=['#000','#fff'])
         lb_obs = ctk.CTkLabel(self,text='Observações', font=('Century Gothic bold',16), text_color=['#000','#fff'])
-
+        btn_submit = ctk.CTkButton(self, text='Salvar dados'.upper(),command=submit,fg_color='#151',hover_color='#131' ).place(x=300,y=420)
+        btn_submit = ctk.CTkButton(self, text='Limpar campos'.upper(),command=clear,fg_color='#555',hover_color='#333' ).place(x=500,y=420)
         #Posicionar elementos
         lb_name.place(x=50,y=120)
         name_entry.place(x=50,y=150)
